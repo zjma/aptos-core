@@ -4,7 +4,7 @@ import argparse
 import json
 import load_bench_datapoints
 import load_bench_ns
-from math import ceil, log2
+from math import ceil, floor, log2
 import matplotlib.pyplot as plt
 import numpy as np
 from pathlib import Path
@@ -21,7 +21,26 @@ class ArkMsmModel:
         num_buckets = 1 << window_size
         cost = self.addition_cost * (x+num_buckets+1) * num_windows + self.doubling_cost * (window_size*num_windows)
         return cost
-
+class NonLinearMsmModel:
+    def __init__(self):
+        pass
+    def predict(self, x):
+        gas = 9420000 * x//floor(log2(x+1)) + 6000 * x
+        ns = gas / 205.41
+        return ns
+class TwoPhasedMsmModel:
+    def __init__(self):
+        pass
+    def predict(self, x):
+        ns = (11108.570175438595*x+40427.833333333125) if x<190 else (6703.821179361177*x+1244411.1577395604)
+        return ns
+class Sha256Model:
+    def __init__(self):
+        pass
+    def predict(self, x):
+        gas = 1000 * x + 60000
+        ns = gas / 205.41
+        return ns
 class LinearModel:
     def __init__(self, k, b):
         self.k = k
@@ -34,6 +53,12 @@ def load_model(model_path):
         return ArkMsmModel(255, load_bench_ns.main('target/criterion/ark_bls12_381/g1_proj_add'), load_bench_ns.main('target/criterion/ark_bls12_381/g1_proj_double'))
     if model_path == 'builtin_ark_bls12_381_g2_affine_msm':
         return ArkMsmModel(255, load_bench_ns.main('target/criterion/ark_bls12_381/g2_proj_add'), load_bench_ns.main('target/criterion/ark_bls12_381/g2_proj_double'))
+    if model_path == 'builtin_non_linear_msm':
+        return NonLinearMsmModel()
+    if model_path == 'builtin_sha256':
+        return Sha256Model()
+    if model_path == '2_phased_msm':
+        return TwoPhasedMsmModel()
     obj = json.loads(Path(model_path).read_text())
     return LinearModel(obj['k'], obj['b'])
 
