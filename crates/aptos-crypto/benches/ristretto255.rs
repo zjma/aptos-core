@@ -14,11 +14,13 @@ use curve25519_dalek::{
 };
 use rand::{distributions::Uniform, prelude::ThreadRng, thread_rng, Rng};
 use std::ops::{Add, Mul, Neg, Sub};
+use std::time::Duration;
 
 fn benchmark_groups(c: &mut Criterion) {
     let mut group = c.benchmark_group("ristretto255");
 
-    group.sample_size(1000);
+    group.measurement_time(Duration::from_millis(1));
+    group.sample_size(10);
 
     point_mul(&mut group);
     basepoint_mul(&mut group);
@@ -43,9 +45,11 @@ fn benchmark_groups(c: &mut Criterion) {
     scalar_neg(&mut group);
     scalar_sub(&mut group);
 
-    //for n in 1..=128 {
-    //for n in [256, 512, 1024, 2048, 4096] {
-    for n in [8192, 16384, 32768] {
+    let p0 = 0;
+    let p1 = 190;
+    let p2 = 2048;
+    let num_datapoints = 10;
+    for n in (p0..p1).step_by((p1-p0)/num_datapoints).chain((p1..p2).step_by((p2-p1)/num_datapoints)) {
         multi_scalar_mul(&mut group, n);
     }
 
