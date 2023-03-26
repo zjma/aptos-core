@@ -4,7 +4,7 @@
 /// See https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-pairing-friendly-curves-11#name-bls-curves-for-the-128-bit-
 /// for the full sepcification of BLS12-381 curves.
 ///
-/// Currently supported the BLS12-381 structures include `Fq12`, `Fr`, `G1Affine`, `G2Affine` and `Gt`,
+/// Currently-supported BLS12-381 structures include `Fq12`, `Fr`, `G1Affine`, `G2Affine` and `Gt`,
 /// along with their widely-used serialization formats,
 /// the pairing between `G1Affine`, `G2Affine` and `Gt`,
 /// and the hash-to-curve operations for `G1Affine` and `G2Affine` defined in https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-hash-to-curve-16.

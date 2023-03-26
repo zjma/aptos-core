@@ -1,14 +1,15 @@
 /// This module provides generic structs/functions for operations of algebraic structures (e.g. fields and groups),
 /// which can be used to build generic cryptographic schemes atop.
+/// E.g., a Groth16 ZK proof verifier can be built to work over any pairing supported in this module.
 ///
 /// In general, every structure implements basic operations like (de)serialization, equality check, random sampling.
 ///
-/// A group may also implement the following operations. (Additive notions are used.)
-/// - `order()` for group order.
-/// - `zero()` for group identity.
-/// - `one()` for group generator (if exists).
-/// - `neg()` for inverse.
-/// - `add()` for a basic group operation.
+/// A group may also implement the following operations. (Additive group notation is assumed.)
+/// - `order()` for getting the group order.
+/// - `zero()` for getting the group identity.
+/// - `one()` for getting the group generator (if exists).
+/// - `neg()` for group element inversion.
+/// - `add()` for group operation (i.e., a group addition).
 /// - `sub()` for group element subtraction.
 /// - `double()` for efficient doubling.
 /// - `scalar_mul()` for group scalar multiplication.
@@ -16,8 +17,8 @@
 /// - `hash_to()` for hash-to-group.
 ///
 /// A field may also implement the following operations.
-/// - `zero()` for the field additive identity.
-/// - `one()` for the field multiplicative identity.
+/// - `zero()` for getting the field additive identity.
+/// - `one()` for getting the field multiplicative identity.
 /// - `add()` for field addition.
 /// - `sub()` for field subtraction.
 /// - `mul()` for field multiplication.
@@ -27,9 +28,11 @@
 /// - `sqr()` for efficient field element squaring.
 /// - `from_u64()` for quick conversion from u64 to field element.
 ///
-/// For 3 groups that form a bilinear map, `pairing()` and `multi_pairing()` may be implemented.
+/// For 3 groups that admit a bilinear map, `pairing()` and `multi_pairing()` may be implemented.
 ///
 /// For a subset/superset relationship between 2 structures, `upcast()` and `downcast()` may be implemented.
+/// E.g., in BLS12-381 pairing, since `Gt` is a subset of `Fq12`,
+/// `upcast<Gt, Fq12>()` and `downcast<Fq12, Gt>()` will be supported.
 ///
 /// See `algebra_*.move` for currently implemented algebraic structures.
 module aptos_std::algebra {

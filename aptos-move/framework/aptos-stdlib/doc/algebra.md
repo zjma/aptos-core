@@ -5,15 +5,16 @@
 
 This module provides generic structs/functions for operations of algebraic structures (e.g. fields and groups),
 which can be used to build generic cryptographic schemes atop.
+E.g., a Groth16 ZK proof verifier can be built to work over any pairing supported in this module.
 
 In general, every structure implements basic operations like (de)serialization, equality check, random sampling.
 
-A group may also implement the following operations. (Additive notions are used.)
-- <code><a href="algebra.md#0x1_algebra_order">order</a>()</code> for group order.
-- <code><a href="algebra.md#0x1_algebra_zero">zero</a>()</code> for group identity.
-- <code><a href="algebra.md#0x1_algebra_one">one</a>()</code> for group generator (if exists).
-- <code><a href="algebra.md#0x1_algebra_neg">neg</a>()</code> for inverse.
-- <code><a href="algebra.md#0x1_algebra_add">add</a>()</code> for a basic group operation.
+A group may also implement the following operations. (Additive group notation is assumed.)
+- <code><a href="algebra.md#0x1_algebra_order">order</a>()</code> for getting the group order.
+- <code><a href="algebra.md#0x1_algebra_zero">zero</a>()</code> for getting the group identity.
+- <code><a href="algebra.md#0x1_algebra_one">one</a>()</code> for getting the group generator (if exists).
+- <code><a href="algebra.md#0x1_algebra_neg">neg</a>()</code> for group element inversion.
+- <code><a href="algebra.md#0x1_algebra_add">add</a>()</code> for group operation (i.e., a group addition).
 - <code><a href="algebra.md#0x1_algebra_sub">sub</a>()</code> for group element subtraction.
 - <code><a href="algebra.md#0x1_algebra_double">double</a>()</code> for efficient doubling.
 - <code><a href="algebra.md#0x1_algebra_scalar_mul">scalar_mul</a>()</code> for group scalar multiplication.
@@ -21,8 +22,8 @@ A group may also implement the following operations. (Additive notions are used.
 - <code><a href="algebra.md#0x1_algebra_hash_to">hash_to</a>()</code> for hash-to-group.
 
 A field may also implement the following operations.
-- <code><a href="algebra.md#0x1_algebra_zero">zero</a>()</code> for the field additive identity.
-- <code><a href="algebra.md#0x1_algebra_one">one</a>()</code> for the field multiplicative identity.
+- <code><a href="algebra.md#0x1_algebra_zero">zero</a>()</code> for getting the field additive identity.
+- <code><a href="algebra.md#0x1_algebra_one">one</a>()</code> for getting the field multiplicative identity.
 - <code><a href="algebra.md#0x1_algebra_add">add</a>()</code> for field addition.
 - <code><a href="algebra.md#0x1_algebra_sub">sub</a>()</code> for field subtraction.
 - <code><a href="algebra.md#0x1_algebra_mul">mul</a>()</code> for field multiplication.
@@ -32,9 +33,11 @@ A field may also implement the following operations.
 - <code><a href="algebra.md#0x1_algebra_sqr">sqr</a>()</code> for efficient field element squaring.
 - <code><a href="algebra.md#0x1_algebra_from_u64">from_u64</a>()</code> for quick conversion from u64 to field element.
 
-For 3 groups that form a bilinear map, <code><a href="algebra.md#0x1_algebra_pairing">pairing</a>()</code> and <code><a href="algebra.md#0x1_algebra_multi_pairing">multi_pairing</a>()</code> may be implemented.
+For 3 groups that admit a bilinear map, <code><a href="algebra.md#0x1_algebra_pairing">pairing</a>()</code> and <code><a href="algebra.md#0x1_algebra_multi_pairing">multi_pairing</a>()</code> may be implemented.
 
 For a subset/superset relationship between 2 structures, <code><a href="algebra.md#0x1_algebra_upcast">upcast</a>()</code> and <code><a href="algebra.md#0x1_algebra_downcast">downcast</a>()</code> may be implemented.
+E.g., in BLS12-381 pairing, since <code>Gt</code> is a subset of <code>Fq12</code>,
+<code><a href="algebra.md#0x1_algebra_upcast">upcast</a>&lt;Gt, Fq12&gt;()</code> and <code><a href="algebra.md#0x1_algebra_downcast">downcast</a>&lt;Fq12, Gt&gt;()</code> will be supported.
 
 See <code>algebra_*.<b>move</b></code> for currently implemented algebraic structures.
 
