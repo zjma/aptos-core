@@ -1000,4 +1000,4 @@ Full specification is defined in https://datatracker.ietf.org/doc/html/draft-irt
 </details>
 
 
-[move-book]: https://move-language.github.io/move/introduction.html
+[move-book]: https://aptos.dev/guides/move-guides/book/SUMMARY

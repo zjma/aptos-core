@@ -232,6 +232,18 @@ Lifetime: transient
 
 
 
+<a name="0x1_features_STRUCT_CONSTRUCTORS"></a>
+
+Whether struct constructors are enabled
+
+Lifetime: transient
+
+
+<pre><code><b>const</b> <a href="features.md#0x1_features_STRUCT_CONSTRUCTORS">STRUCT_CONSTRUCTORS</a>: u64 = 15;
+</code></pre>
+
+
+
 <a name="0x1_features_TREAT_FRIEND_AS_PRIVATE"></a>
 
 Whether during upgrade compatibility checking, friend functions should be treated similar like
@@ -1062,4 +1074,4 @@ Helper to check whether a feature flag is enabled.
 </code></pre>
 
 
-[move-book]: https://move-language.github.io/move/introduction.html
+[move-book]: https://aptos.dev/guides/move-guides/book/SUMMARY

@@ -7,7 +7,7 @@
 //! This crate provides [`AptosDB`] which represents physical storage of the core Aptos data
 //! structures.
 //!
-//! It relays read/write operations on the physical storage via [`schemadb`] to the underlying
+//! It relays read/write operations on the physical storage via `schemadb` to the underlying
 //! Key-Value storage system, and implements aptos data structures on top of it.
 
 #[cfg(feature = "consensus-only-perf-test")]
@@ -137,7 +137,7 @@ pub const LEDGER_DB_NAME: &str = "ledger_db";
 pub const STATE_MERKLE_DB_NAME: &str = "state_merkle_db";
 pub const STATE_KV_DB_NAME: &str = "state_kv_db";
 
-pub(crate) const NUM_STATE_SHARDS: usize = 256;
+pub(crate) const NUM_STATE_SHARDS: usize = 16;
 
 static COMMIT_POOL: Lazy<rayon::ThreadPool> = Lazy::new(|| {
     rayon::ThreadPoolBuilder::new()
@@ -189,6 +189,12 @@ static ROCKSDB_PROPERTY_MAP: Lazy<HashMap<&str, String>> = Lazy::new(|| {
     .map(|x| (*x, format!("aptos_{}", x.replace('.', "_"))))
     .collect()
 });
+
+type ShardedStateKvSchemaBatch = [SchemaBatch; NUM_STATE_SHARDS];
+
+pub(crate) fn new_sharded_schema_batch() -> ShardedStateKvSchemaBatch {
+    arr![SchemaBatch::new(); 16]
+}
 
 fn error_if_too_many_requested(num_requested: u64, max_allowed: u64) -> Result<()> {
     if num_requested > max_allowed {
@@ -1150,11 +1156,10 @@ impl DbReader for AptosDB {
                 .get_transaction_iter(start_version, limit as usize)?;
             let gas_prices: Vec<_> = txns
                 .filter_map(|txn| {
-                    if let Ok(Transaction::UserTransaction(txn)) = txn {
-                        Some(txn.gas_unit_price())
-                    } else {
-                        None
-                    }
+                    txn.as_ref()
+                        .ok()
+                        .and_then(|t| t.try_as_signed_user_txn())
+                        .map(|t| t.gas_unit_price())
                 })
                 .collect();
 
@@ -1714,7 +1719,7 @@ impl DbWriter for AptosDB {
 
             // Gather db mutations to `batch`.
             let ledger_batch = SchemaBatch::new();
-            let sharded_state_kv_batches = arr![SchemaBatch::new(); 256];
+            let sharded_state_kv_batches = new_sharded_schema_batch();
 
             let new_root_hash = self.save_transactions_impl(
                 txns_to_commit,
