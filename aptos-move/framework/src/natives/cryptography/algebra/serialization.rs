@@ -272,6 +272,9 @@ pub fn deserialize_internal(
     let bytes = bytes_ref.as_slice();
     match (structure_opt, format_opt) {
         (Some(Structure::BLS12381Fr), Some(SerializationFormat::BLS12381FrLsb)) => {
+            // Valid BLS12381FrLsb serialization should be 32-byte.
+            // NOTE: Arkworks deserialization cost grows as the input size grows.
+            // So exit early if the size is incorrect, for gas safety. (Also applied to other cases.)
             if bytes.len() != 32 {
                 return Ok(smallvec![Value::bool(false), Value::u64(0)]);
             }
@@ -284,6 +287,7 @@ pub fn deserialize_internal(
             )
         },
         (Some(Structure::BLS12381Fr), Some(SerializationFormat::BLS12381FrMsb)) => {
+            // Valid BLS12381FrMsb serialization should be 32-byte.
             if bytes.len() != 32 {
                 return Ok(smallvec![Value::bool(false), Value::u64(0)]);
             }
@@ -299,6 +303,7 @@ pub fn deserialize_internal(
             )
         },
         (Some(Structure::BLS12381Fq12), Some(SerializationFormat::BLS12381Fq12LscLsb)) => {
+            // Valid BLS12381Fq12LscLsb serialization should be 576-byte.
             if bytes.len() != 576 {
                 return Ok(smallvec![Value::bool(false), Value::u64(0)]);
             }
@@ -314,6 +319,7 @@ pub fn deserialize_internal(
             Some(Structure::BLS12381G1Affine),
             Some(SerializationFormat::BLS12381G1AffineUncompressed),
         ) => {
+            // Valid BLS12381G1AffineUncompressed serialization should be 96-byte.
             if bytes.len() != 96 {
                 return Ok(smallvec![Value::bool(false), Value::u64(0)]);
             }
@@ -329,6 +335,7 @@ pub fn deserialize_internal(
             Some(Structure::BLS12381G1Affine),
             Some(SerializationFormat::BLS12381G1AffineCompressed),
         ) => {
+            // Valid BLS12381G1AffineCompressed serialization should be 48-byte.
             if bytes.len() != 48 {
                 return Ok(smallvec![Value::bool(false), Value::u64(0)]);
             }
@@ -344,6 +351,7 @@ pub fn deserialize_internal(
             Some(Structure::BLS12381G2Affine),
             Some(SerializationFormat::BLS12381G2AffineUncompressed),
         ) => {
+            // Valid BLS12381G2AffineUncompressed serialization should be 192-byte.
             if bytes.len() != 192 {
                 return Ok(smallvec![Value::bool(false), Value::u64(0)]);
             }
@@ -359,6 +367,7 @@ pub fn deserialize_internal(
             Some(Structure::BLS12381G2Affine),
             Some(SerializationFormat::BLS12381G2AffineCompressed),
         ) => {
+            // Valid BLS12381G2AffineCompressed serialization should be 96-byte.
             if bytes.len() != 96 {
                 return Ok(smallvec![Value::bool(false), Value::u64(0)]);
             }
@@ -371,6 +380,7 @@ pub fn deserialize_internal(
             )
         },
         (Some(Structure::BLS12381Gt), Some(SerializationFormat::BLS12381Gt)) => {
+            // Valid BLS12381Gt serialization should be 576-byte.
             if bytes.len() != 576 {
                 return Ok(smallvec![Value::bool(false), Value::u64(0)]);
             }

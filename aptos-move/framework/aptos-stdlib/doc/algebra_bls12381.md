@@ -7,7 +7,7 @@ This module defines marker types, constants and test cases for working with BLS1
 using generic API defined in <code><a href="algebra.md#0x1_algebra">algebra</a>.<b>move</b></code>.
 
 See https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-pairing-friendly-curves-11#name-bls-curves-for-the-128-bit-
-for the full sepcification of BLS12-381 curves.
+for the full specification of BLS12-381 curves.
 
 Currently-supported BLS12-381 structures include <code><a href="algebra_bls12381.md#0x1_algebra_bls12381_Fq12">Fq12</a></code>, <code><a href="algebra_bls12381.md#0x1_algebra_bls12381_Fr">Fr</a></code>, <code><a href="algebra_bls12381.md#0x1_algebra_bls12381_G1Affine">G1Affine</a></code>, <code><a href="algebra_bls12381.md#0x1_algebra_bls12381_G2Affine">G2Affine</a></code> and <code><a href="algebra_bls12381.md#0x1_algebra_bls12381_Gt">Gt</a></code>,
 along with their widely-used serialization formats,
@@ -374,7 +374,7 @@ NOTE: the same scheme is also used in other implementations (e.g. ark-bls12-381-
 
 ## Struct `G1AffineParent`
 
-A group constructed by the points on the BLS12-381 curve $E(F_q): y^2=x^3+4$ and the point at inifinity,
+A group constructed by the points on the BLS12-381 curve $E(F_q): y^2=x^3+4$ and the point at infinity,
 under the elliptic curve point addition.
 It contains the prime-order subgroup $G_1$ used in pairing.
 The identity is the point at infinity.
@@ -409,7 +409,7 @@ NOTE: currently information-only and no operations are implemented for this stru
 
 A serialization scheme for <code><a href="algebra_bls12381.md#0x1_algebra_bls12381_G1AffineParent">G1AffineParent</a></code> elements,
 where an element is represented by a byte array <code>b[]</code> of size 96,
-with the following rules deseribed from the perspective of deserialization.
+with the following rules described from the perspective of deserialization.
 1. Read <code>b[0] & 0x80</code> as the compression flag. Abort if it is 1.
 1. Read <code>b[0] & 0x40</code> as the infinity flag.
 1. Read <code>b[0] & 0x20</code> as the lexicographical flag. This is ignored.
@@ -449,7 +449,7 @@ NOTE: currently information-only, not implemented.
 
 A serialization scheme for <code><a href="algebra_bls12381.md#0x1_algebra_bls12381_G1AffineParent">G1AffineParent</a></code> elements,
 where an element is represented by a byte array <code>b[]</code> of size 48,
-with the following rules deseribed from the perspective of deserialization.
+with the following rules described from the perspective of deserialization.
 1. Read <code>b[0] & 0x80</code> as the compression flag. Abort if it is 0.
 1. Read <code>b[0] & 0x40</code> as the infinity flag.
 1. Read <code>b[0] & 0x20</code> as the lexicographical flag.
@@ -583,7 +583,7 @@ NOTE: the same scheme is also used in other implementations (e.g. ark-bls12-381-
 
 ## Struct `G2AffineParent`
 
-A group constructed by the points on a curve $E'(F_{q^2})$ and the point at inifinity under the elliptic curve point addition.
+A group constructed by the points on a curve $E'(F_{q^2})$ and the point at infinity under the elliptic curve point addition.
 $E'(F_{q^2})$ is an elliptic curve $y^2=x^3+4(u+1)$ defined over $F_{q^2}$.
 The identity of <code><a href="algebra_bls12381.md#0x1_algebra_bls12381_G2Affine">G2Affine</a></code> is the point at infinity.
 
@@ -617,7 +617,7 @@ NOTE: currently information-only and no operations are implemented for this stru
 
 A serialization scheme for <code><a href="algebra_bls12381.md#0x1_algebra_bls12381_G2AffineParent">G2AffineParent</a></code> elements.
 where an element is represented by a byte array <code>b[]</code> of size 192,
-with the following rules deseribed from the perspective of deserialization.
+with the following rules described from the perspective of deserialization.
 1. Read <code>b[0] & 0x80</code> as the compression flag. Abort if it is 1.
 1. Read <code>b[0] & 0x40</code> as the infinity flag.
 1. Read <code>b[0] & 0x20</code> as the lexicographical flag. This is ignored.
@@ -657,7 +657,7 @@ NOTE: currently information-only, not implemented.
 
 A serialization scheme for <code><a href="algebra_bls12381.md#0x1_algebra_bls12381_G1AffineParent">G1AffineParent</a></code> elements,
 where an element is represented by a byte array <code>b[]</code> of size 96,
-with the following rules deseribed from the perspective of deserialization.
+with the following rules described from the perspective of deserialization.
 1. Read <code>b[0] & 0x80</code> as the compression flag. Abort if it is 0.
 1. Read <code>b[0] & 0x40</code> as the infinity flag.
 1. Read <code>b[0] & 0x20</code> as the lexicographical flag.
