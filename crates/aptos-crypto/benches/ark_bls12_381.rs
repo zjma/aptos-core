@@ -49,12 +49,6 @@ macro_rules! serialize {
 fn bench_group(c: &mut Criterion) {
     let mut group = c.benchmark_group("ark_bls12_381");
 
-    // Debugging configurations begin.
-    group.sample_size(10);
-    group.warm_up_time(Duration::from_millis(500));
-    group.measurement_time(Duration::from_millis(500));
-    // Debugging configurations end.
-
     group.bench_function("fr_add", move |b| {
         b.iter_with_setup(
             || (rand!(Fr), rand!(Fr)),
@@ -407,7 +401,7 @@ fn bench_group(c: &mut Criterion) {
                 serialize!(p, serialize_compressed)
             },
             |buf| {
-                let _p = G1Affine::deserialize_uncompressed(buf.as_slice());
+                let _p = G1Affine::deserialize_compressed(buf.as_slice());
             },
         )
     });
@@ -601,7 +595,7 @@ fn bench_group(c: &mut Criterion) {
                 serialize!(p, serialize_compressed)
             },
             |buf| {
-                let _p = G2Affine::deserialize_uncompressed(buf.as_slice());
+                let _p = G2Affine::deserialize_compressed(buf.as_slice());
             },
         )
     });
