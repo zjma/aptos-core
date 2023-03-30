@@ -10,7 +10,9 @@ def main(bench_path):
     Param `bench_path` can be the result of any single-datapoint bench (e.g., 'target/criterion/ark_bls12_381/fr_add'),
     or a single result of a serial bench (e.g., 'target/criterion/hash/SHA2-256/0').
     '''
-    jsonstr = Path(f'{bench_path}/new/estimates.json').read_text()
+    json_path = Path(f'{bench_path}/new/estimates.json')
+    if not json_path.exists(): return None
+    jsonstr = json_path.read_text()
     obj = json.loads(jsonstr)
     ns = obj['median']['point_estimate']
     assert type(ns)==float
