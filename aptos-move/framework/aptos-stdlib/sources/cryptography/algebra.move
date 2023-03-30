@@ -328,7 +328,7 @@ module aptos_std::algebra {
 
     #[test(fx = @std)]
     #[expected_failure(abort_code = 0x0c0000, location = Self)]
-    fun test_unknown_group(fx: signer) {
+    fun test_generic_operation_should_abort_with_unsupported_structures(fx: signer) {
         enable_cryptography_algebra_natives(&fx);
         let _ = order<MysteriousGroup>();
     }
