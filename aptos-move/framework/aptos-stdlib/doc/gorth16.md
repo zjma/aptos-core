@@ -22,7 +22,8 @@ See the test cases in this module for an example of constructing with BLS12-381 
 
 ## Function `verify_proof`
 
-Proof verification as specifid in the original paper, with the following input.
+Proof verification as specifid in the original paper,
+with the following input (in the original paper notations).
 - Verification key: $\left([\alpha]_1, [\beta]_2, [\gamma]_2, [\delta]_2, \left\\{ \left[ \frac{\beta \cdot u_i(x) + \alpha \cdot v_i(x) + w_i(x)}{\gamma} \right]_1 \right\\}\_{i=0}^l \right)$.
 - Public inputs: $\\{a_i\\}_{i=1}^l$.
 - Proof $\left( \left[ A \right]_1, \left[ B \right]_2, \left[ C \right]_1 \right)$.
@@ -67,7 +68,8 @@ Proof verification as specifid in the original paper, with the following input.
 
 ## Function `verify_proof_prepared`
 
-Proof verification optimized for low verification latency but requiring pre-computation, with the following input.
+Proof verification optimized for low verification latency but requiring pre-computation,
+with the following input (in the original paper notations).
 - Prepared verification key: $\left([\alpha]_1 \cdot [\beta]_2, -[\gamma]_2, -[\delta]_2, \left\\{ \left[ \frac{\beta \cdot u_i(x) + \alpha \cdot v_i(x) + w_i(x)}{\gamma} \right]_1 \right\\}\_{i=0}^l \right)$.
 - Public inputs: $\\{a_i\\}_{i=1}^l$.
 - Proof: $\left( \left[ A \right]_1, \left[ B \right]_2, \left[ C \right]_1 \right)$.
