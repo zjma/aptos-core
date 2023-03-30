@@ -1,18 +1,24 @@
 // Copyright © Aptos Foundation
 
+#[cfg(feature = "testing")]
 use crate::{
     natives::cryptography::algebra::{AlgebraContext, Structure, BLS12381_GT_GENERATOR},
     store_element, structure_from_ty_arg,
 };
+#[cfg(feature = "testing")]
 use ark_ff::Field;
+#[cfg(feature = "testing")]
 use ark_std::{test_rng, UniformRand};
 use move_binary_format::errors::PartialVMResult;
 use move_core_types::gas_algebra::InternalGas;
 use move_vm_runtime::native_functions::NativeContext;
+#[cfg(feature = "testing")]
 use move_vm_types::{
     loaded_data::runtime_types::Type, natives::function::NativeResult, values::Value,
 };
+#[cfg(feature = "testing")]
 use smallvec::smallvec;
+#[cfg(feature = "testing")]
 use std::{collections::VecDeque, rc::Rc};
 
 #[cfg(feature = "testing")]

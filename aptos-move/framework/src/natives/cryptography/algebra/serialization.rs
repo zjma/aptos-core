@@ -25,39 +25,24 @@ use smallvec::{smallvec, SmallVec};
 use std::{collections::VecDeque, rc::Rc};
 
 pub fn feature_flag_of_serialization_format(
-    structure_opt: Option<Structure>,
     format_opt: Option<SerializationFormat>,
 ) -> Option<FeatureFlag> {
-    match (structure_opt, format_opt) {
-        (Some(Structure::BLS12381Fr), Some(SerializationFormat::BLS12381FrLsb))
-        | (Some(Structure::BLS12381Fr), Some(SerializationFormat::BLS12381FrMsb))
-        | (Some(Structure::BLS12381Fq12), Some(SerializationFormat::BLS12381Fq12LscLsb))
-        | (
-            Some(Structure::BLS12381G1Affine),
-            Some(SerializationFormat::BLS12381G1AffineUncompressed),
-        )
-        | (
-            Some(Structure::BLS12381G1Affine),
-            Some(SerializationFormat::BLS12381G1AffineCompressed),
-        )
-        | (
-            Some(Structure::BLS12381G2Affine),
-            Some(SerializationFormat::BLS12381G2AffineUncompressed),
-        )
-        | (
-            Some(Structure::BLS12381G2Affine),
-            Some(SerializationFormat::BLS12381G2AffineCompressed),
-        )
-        | (Some(Structure::BLS12381Gt), Some(SerializationFormat::BLS12381Gt)) => {
-            Some(FeatureFlag::BLS12_381_STRUCTURES)
-        },
+    match format_opt {
+        Some(SerializationFormat::BLS12381FrLsb)
+        | Some(SerializationFormat::BLS12381FrMsb)
+        | Some(SerializationFormat::BLS12381Fq12LscLsb)
+        | Some(SerializationFormat::BLS12381G1AffineUncompressed)
+        | Some(SerializationFormat::BLS12381G1AffineCompressed)
+        | Some(SerializationFormat::BLS12381G2AffineUncompressed)
+        | Some(SerializationFormat::BLS12381G2AffineCompressed)
+        | Some(SerializationFormat::BLS12381Gt) => Some(FeatureFlag::BLS12_381_STRUCTURES),
         _ => None,
     }
 }
 
 macro_rules! abort_unless_serialization_format_enabled {
-    ($context:ident, $structure_opt:expr, $format_opt:expr) => {
-        let flag_opt = feature_flag_of_serialization_format($structure_opt, $format_opt);
+    ($context:ident, $format_opt:expr) => {
+        let flag_opt = feature_flag_of_serialization_format($format_opt);
         abort_unless_feature_flag_enabled!($context, flag_opt);
     };
 }
@@ -114,7 +99,7 @@ pub fn serialize_internal(
     assert_eq!(2, ty_args.len());
     let structure_opt = structure_from_ty_arg!(context, &ty_args[0]);
     let format_opt = format_from_ty_arg!(context, &ty_args[1]);
-    abort_unless_serialization_format_enabled!(context, structure_opt, format_opt);
+    abort_unless_serialization_format_enabled!(context, format_opt);
     match (structure_opt, format_opt) {
         (Some(Structure::BLS12381Fr), Some(SerializationFormat::BLS12381FrLsb)) => {
             let buf = ark_serialize_internal!(
@@ -266,7 +251,7 @@ pub fn deserialize_internal(
     assert_eq!(2, ty_args.len());
     let structure_opt = structure_from_ty_arg!(context, &ty_args[0]);
     let format_opt = format_from_ty_arg!(context, &ty_args[1]);
-    abort_unless_serialization_format_enabled!(context, structure_opt, format_opt);
+    abort_unless_serialization_format_enabled!(context, format_opt);
     let vector_ref = safely_pop_arg!(args, VectorRef);
     let bytes_ref = vector_ref.as_bytes_ref();
     let bytes = bytes_ref.as_slice();

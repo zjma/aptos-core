@@ -5,6 +5,8 @@
 
 #[cfg(feature = "testing")]
 use crate::natives::cryptography::algebra::rand::rand_insecure_internal;
+#[cfg(feature = "testing")]
+use crate::natives::helpers::make_test_only_native_from_func;
 use crate::natives::{
     cryptography::algebra::{
         arithmetics::{
@@ -20,7 +22,7 @@ use crate::natives::{
         pairing::{multi_pairing_internal, pairing_internal},
         serialization::{deserialize_internal, serialize_internal},
     },
-    helpers::{make_safe_native, make_test_only_native_from_func},
+    helpers::make_safe_native,
 };
 use aptos_types::on_chain_config::{FeatureFlag, Features, TimedFeatures};
 use arithmetics::{
@@ -44,6 +46,7 @@ pub mod gas;
 pub mod hash_to_structure;
 pub mod new;
 pub mod pairing;
+#[cfg(feature = "testing")]
 pub mod rand;
 pub mod serialization;
 

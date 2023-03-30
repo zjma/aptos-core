@@ -17,10 +17,7 @@ use ark_serialize::{CanonicalDeserialize, CanonicalSerialize};
 use ark_std::test_rng;
 use criterion::{BenchmarkId, Criterion};
 use rand::thread_rng;
-use std::{
-    ops::{Add, Div, Mul, Neg},
-    time::Duration,
-};
+use std::ops::{Add, Div, Mul, Neg};
 
 fn msm_all_bench_cases() -> Vec<usize> {
     let series_until_65 = (1..65).step_by(2);
