@@ -1,20 +1,19 @@
-/// A generic Groth16 proof verifier that works with BN/BLS curve-based pairing supported by `algebra_*.move`.
-///
-/// The original algorithm referred to across this module is specified in Section 3.2 of https://eprint.iacr.org/2016/260.pdf.
+/// Generic implementation of Groth16 (proof verification) as defined in https://eprint.iacr.org/2016/260.pdf, Section 3.2.
+/// Actual proof verifiers can be constructed using the pairings supported in the generic algebra module.
+/// See the test cases in this module for an example of constructing with BLS12-381 curves.
 module aptos_std::groth16 {
     use aptos_std::algebra::{Element, from_u64, multi_scalar_mul, eq, multi_pairing, upcast, pairing, add, zero};
 
-    /// Groth16 proof verification with
-    /// verification key $\left([\alpha]_1, [\beta]_2, [\gamma]_2, [\delta]_2, \left\\{ \left[ \frac{\beta \cdot u_i(x) + \alpha \cdot v_i(x) + w_i(x)}{\gamma} \right]_1 \right\\}\_{i=0}^l \right)$,
-    /// public inputs $\\{a_i\\}_{i=1}^l$,
-    /// and proof $\left( \left[ A \right]_1, \left[ B \right]_2, \left[ C \right]_1 \right)$
-    /// (using the original paper notations).
+    /// Proof verification as specifid in the original paper, with the following input.
+    /// - Verification key: $\left([\alpha]_1, [\beta]_2, [\gamma]_2, [\delta]_2, \left\\{ \left[ \frac{\beta \cdot u_i(x) + \alpha \cdot v_i(x) + w_i(x)}{\gamma} \right]_1 \right\\}\_{i=0}^l \right)$.
+    /// - Public inputs: $\\{a_i\\}_{i=1}^l$.
+    /// - Proof $\left( \left[ A \right]_1, \left[ B \right]_2, \left[ C \right]_1 \right)$.
     public fun verify_proof<G1,G2,Gt,S>(
         vk_alpha_g1: &Element<G1>,
         vk_beta_g2: &Element<G2>,
         vk_gamma_g2: &Element<G2>,
         vk_delta_g2: &Element<G2>,
-        vk_gamma_abc_g1: &vector<Element<G1>>,
+        vk_uvw_gamma_g1: &vector<Element<G1>>,
         public_inputs: &vector<Element<S>>,
         proof_a: &Element<G1>,
         proof_b: &Element<G2>,
@@ -25,23 +24,20 @@ module aptos_std::groth16 {
         std::vector::append(&mut scalars, *public_inputs);
         let right = zero<Gt>();
         let right = add(&right, &pairing<G1,G2,Gt>(vk_alpha_g1, vk_beta_g2));
-        let right = add(&right, &pairing(&multi_scalar_mul(vk_gamma_abc_g1, &scalars), vk_gamma_g2));
+        let right = add(&right, &pairing(&multi_scalar_mul(vk_uvw_gamma_g1, &scalars), vk_gamma_g2));
         let right = add(&right, &pairing(proof_c, vk_delta_g2));
         eq(&left, &right)
     }
 
-    /// Groth16 proof verification with
-    /// prepared verification key $\left([\alpha]_1 \cdot [\beta]_2, -[\gamma]_2, -[\delta]_2, \left\\{ \left[ \frac{\beta \cdot u_i(x) + \alpha \cdot v_i(x) + w_i(x)}{\gamma} \right]_1 \right\\}\_{i=0}^l \right)$,
-    /// public inputs $\\{a_i\\}_{i=1}^l$,
-    /// and proof $\left( \left[ A \right]_1, \left[ B \right]_2, \left[ C \right]_1 \right)$
-    /// (using the original paper notations).
-    ///
-    /// This is faster than `verify_proof()` but requires some pre-computation.
+    /// Proof verification optimized for low verification latency but requiring pre-computation, with the following input.
+    /// - Prepared verification key: $\left([\alpha]_1 \cdot [\beta]_2, -[\gamma]_2, -[\delta]_2, \left\\{ \left[ \frac{\beta \cdot u_i(x) + \alpha \cdot v_i(x) + w_i(x)}{\gamma} \right]_1 \right\\}\_{i=0}^l \right)$.
+    /// - Public inputs: $\\{a_i\\}_{i=1}^l$.
+    /// - Proof: $\left( \left[ A \right]_1, \left[ B \right]_2, \left[ C \right]_1 \right)$.
     public fun verify_proof_prepared<G1,G2,Gt,GtParent,S>(
         pvk_alpha_g1_beta_g2: &Element<GtParent>,
         pvk_gamma_g2_neg: &Element<G2>,
         pvk_delta_g2_neg: &Element<G2>,
-        pvk_gamma_abc_g1: &vector<Element<G1>>,
+        pvk_uvw_gamma_g1: &vector<Element<G1>>,
         public_inputs: &vector<Element<S>>,
         proof_a: &Element<G1>,
         proof_b: &Element<G2>,
@@ -49,7 +45,7 @@ module aptos_std::groth16 {
     ): bool {
         let scalars = vector[from_u64<S>(1)];
         std::vector::append(&mut scalars, *public_inputs);
-        let g1_elements = vector[*proof_a, multi_scalar_mul(pvk_gamma_abc_g1, &scalars), *proof_c];
+        let g1_elements = vector[*proof_a, multi_scalar_mul(pvk_uvw_gamma_g1, &scalars), *proof_c];
         let g2_elements = vector[*proof_b, *pvk_gamma_g2_neg, *pvk_delta_g2_neg];
         eq(pvk_alpha_g1_beta_g2, &upcast(&multi_pairing<G1,G2,Gt>(&g1_elements, &g2_elements)))
     }
