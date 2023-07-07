@@ -22,7 +22,7 @@ use aptos_infallible::Mutex;
 use aptos_logger::prelude::*;
 use aptos_types::{
     account_address::AccountAddress, contract_event::ContractEvent, epoch_state::EpochState,
-    ledger_info::LedgerInfoWithSignatures, transaction::Transaction,
+    ledger_info::LedgerInfoWithSignatures, transaction::Transaction, randomness::Randomness,
 };
 use fail::fail_point;
 use futures::{SinkExt, StreamExt};
@@ -108,6 +108,7 @@ impl StateComputer for ExecutionProxy {
         block: &Block,
         // The parent block id.
         parent_block_id: HashValue,
+        maybe_randomness: Option<Randomness>,
     ) -> Result<StateComputeResult, ExecutionError> {
         fail_point!("consensus::compute", |_| {
             Err(ExecutionError::InternalError {
@@ -126,6 +127,9 @@ impl StateComputer for ExecutionProxy {
         let txn_shuffler = self.transaction_shuffler.lock().as_ref().unwrap().clone();
         let txns = payload_manager.get_transactions(block).await?;
 
+        // dkg todo: get the dkg transcript from the txns
+        let dkg_transcripts = vec![];
+
         let deduped_txns = txn_deduper.dedup(txns);
         let shuffled_txns = txn_shuffler.shuffle(deduped_txns);
 
@@ -138,6 +142,8 @@ impl StateComputer for ExecutionProxy {
             &self.validators.lock(),
             shuffled_txns.clone(),
             block_gas_limit,
+            dkg_transcripts,
+            maybe_randomness,
         );
 
         let compute_result = monitor!(
@@ -204,10 +210,16 @@ impl StateComputer for ExecutionProxy {
             let deduped_txns = txn_deduper.dedup(signed_txns);
             let shuffled_txns = txn_shuffler.shuffle(deduped_txns);
 
+            // dkg todo: get all dkg transcripts from the txns
+            let dkg_transcripts = vec![];
+            let maybe_randomness = block.maybe_randomness();
+
             txns.extend(block.transactions_to_commit(
                 &self.validators.lock(),
                 shuffled_txns,
                 block_gas_limit,
+                dkg_transcripts,
+                maybe_randomness,
             ));
             reconfig_events.extend(block.reconfig_event());
         }

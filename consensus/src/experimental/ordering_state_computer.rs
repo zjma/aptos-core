@@ -18,7 +18,7 @@ use aptos_consensus_types::{block::Block, executed_block::ExecutedBlock};
 use aptos_crypto::HashValue;
 use aptos_executor_types::{Error as ExecutionError, StateComputeResult};
 use aptos_logger::prelude::*;
-use aptos_types::{epoch_state::EpochState, ledger_info::LedgerInfoWithSignatures};
+use aptos_types::{epoch_state::EpochState, ledger_info::LedgerInfoWithSignatures, randomness::Randomness};
 use fail::fail_point;
 use futures::{
     channel::{mpsc::UnboundedSender, oneshot},
@@ -59,6 +59,7 @@ impl StateComputer for OrderingStateComputer {
         _block: &Block,
         // The parent block id.
         _parent_block_id: HashValue,
+        _maybe_randomness: Option<Randomness>,
     ) -> Result<StateComputeResult, ExecutionError> {
         // Return dummy block and bypass the execution phase.
         // This will break the e2e smoke test (for now because

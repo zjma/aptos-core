@@ -1325,6 +1325,9 @@ impl AptosVM {
             self.0
                 .new_session(resolver, SessionId::block_meta(&block_metadata), true);
 
+        // dkg todo: verify the validity of the dkg transcript if there is one in block metadata
+        // only pass in the first valid dkg transcript to the prologue as args
+
         let args = serialize_values(&block_metadata.get_prologue_move_args(txn_data.sender));
         session
             .execute_function_bypass_visibility(

@@ -885,6 +885,8 @@ impl<'a> MoveTestAdapter<'a> for AptosTestAdapter<'a> {
                     vec![],
                     vec![],
                     block_cmd.time,
+                    vec![],
+                    None,
                 );
 
                 let output = self.run_transaction(Transaction::BlockMetadata(metadata))?;

@@ -603,6 +603,8 @@ impl FakeExecutor {
             BitVec::with_num_bits(validator_set.num_validators() as u16).into(),
             failed_proposer_indices,
             self.block_time,
+            vec![],
+            None,
         );
         txn_block.insert(0, Transaction::BlockMetadata(new_block_metadata));
 

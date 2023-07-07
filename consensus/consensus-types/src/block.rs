@@ -18,7 +18,7 @@ use aptos_types::{
     ledger_info::LedgerInfo,
     transaction::{SignedTransaction, Transaction, Version},
     validator_signer::ValidatorSigner,
-    validator_verifier::ValidatorVerifier,
+    validator_verifier::ValidatorVerifier, randomness::{DKGTranscript, Randomness},
 };
 use mirai_annotations::debug_checked_verify_eq;
 use serde::{Deserialize, Deserializer, Serialize};
@@ -347,12 +347,14 @@ impl Block {
         validators: &[AccountAddress],
         txns: Vec<SignedTransaction>,
         block_gas_limit: Option<u64>,
+        dkg_transcripts: Vec<DKGTranscript>,
+        maybe_randomness: Option<Randomness>,
     ) -> Vec<Transaction> {
         if block_gas_limit.is_some() {
             // After the per-block gas limit change, StateCheckpoint txn
             // is inserted after block execution
             once(Transaction::BlockMetadata(
-                self.new_block_metadata(validators),
+                self.new_block_metadata(validators, dkg_transcripts, maybe_randomness),
             ))
             .chain(txns.into_iter().map(Transaction::UserTransaction))
             .collect()
@@ -360,7 +362,7 @@ impl Block {
             // Before the per-block gas limit change, StateCheckpoint txn
             // is inserted here for compatibility.
             once(Transaction::BlockMetadata(
-                self.new_block_metadata(validators),
+                self.new_block_metadata(validators, dkg_transcripts, maybe_randomness),
             ))
             .chain(txns.into_iter().map(Transaction::UserTransaction))
             .chain(once(Transaction::StateCheckpoint(self.id)))
@@ -368,7 +370,7 @@ impl Block {
         }
     }
 
-    fn new_block_metadata(&self, validators: &[AccountAddress]) -> BlockMetadata {
+    fn new_block_metadata(&self, validators: &[AccountAddress], dkg_transcripts: Vec<DKGTranscript>, maybe_randomness: Option<Randomness>) -> BlockMetadata {
         BlockMetadata::new(
             self.id(),
             self.epoch(),
@@ -387,6 +389,8 @@ impl Block {
                     Self::failed_authors_to_indices(validators, failed_authors)
                 }),
             self.timestamp_usecs(),
+            dkg_transcripts,
+            maybe_randomness,
         )
     }
 

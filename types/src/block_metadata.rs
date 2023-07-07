@@ -5,7 +5,7 @@
 use aptos_crypto::HashValue;
 use move_core_types::{account_address::AccountAddress, value::MoveValue};
 use serde::{Deserialize, Serialize};
-
+use crate::randomness::{DKGTranscript, Randomness};
 /// Struct that will be persisted on chain to store the information of the current block.
 ///
 /// The flow will look like following:
@@ -27,6 +27,9 @@ pub struct BlockMetadata {
     previous_block_votes_bitvec: Vec<u8>,
     failed_proposer_indices: Vec<u32>,
     timestamp_usecs: u64,
+    // dkg todo
+    dkg_transcripts: Vec<DKGTranscript>,
+    maybe_randomness: Option<Randomness>,
 }
 
 impl BlockMetadata {
@@ -38,6 +41,8 @@ impl BlockMetadata {
         previous_block_votes_bitvec: Vec<u8>,
         failed_proposer_indices: Vec<u32>,
         timestamp_usecs: u64,
+        dkg_transcripts: Vec<DKGTranscript>,
+        maybe_randomness: Option<Randomness>,
     ) -> Self {
         Self {
             id,
@@ -47,6 +52,8 @@ impl BlockMetadata {
             previous_block_votes_bitvec,
             failed_proposer_indices,
             timestamp_usecs,
+            dkg_transcripts,
+            maybe_randomness,
         }
     }
 
@@ -75,6 +82,7 @@ impl BlockMetadata {
                     .collect(),
             ),
             MoveValue::U64(self.timestamp_usecs),
+            // dkg todo: pass in the dkg transcript and randomness
         ]
     }
 
@@ -100,5 +108,13 @@ impl BlockMetadata {
 
     pub fn round(&self) -> u64 {
         self.round
+    }
+
+    pub fn dkg_transcripts(&self) -> &Vec<DKGTranscript> {
+        &self.dkg_transcripts
+    }
+
+    pub fn maybe_randomness(&self) -> &Option<Randomness> {
+        &self.maybe_randomness
     }
 }
