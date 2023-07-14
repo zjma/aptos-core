@@ -14,7 +14,8 @@ use aptos_types::{
     account_address::AccountAddress,
     block_info::BlockInfo,
     contract_event::ContractEvent,
-    transaction::{SignedTransaction, Transaction, TransactionStatus}, randomness::{DKGTranscript, Randomness},
+    randomness::{DKGTranscript, Randomness},
+    transaction::{SignedTransaction, Transaction, TransactionStatus},
 };
 use std::fmt::{Debug, Display, Formatter};
 
@@ -45,7 +46,11 @@ impl Display for ExecutedBlock {
 }
 
 impl ExecutedBlock {
-    pub fn new(block: Block, state_compute_result: StateComputeResult, maybe_randomness: Option<Randomness>) -> Self {
+    pub fn new(
+        block: Block,
+        state_compute_result: StateComputeResult,
+        maybe_randomness: Option<Randomness>,
+    ) -> Self {
         Self {
             block,
             state_compute_result,
@@ -124,9 +129,13 @@ impl ExecutedBlock {
             return vec![];
         }
 
-        let mut txns_with_state_checkpoint =
-            self.block
-                .transactions_to_execute(validators, txns, block_gas_limit, dkg_transcripts, maybe_randomness);
+        let mut txns_with_state_checkpoint = self.block.transactions_to_execute(
+            validators,
+            txns,
+            block_gas_limit,
+            dkg_transcripts,
+            maybe_randomness,
+        );
         if block_gas_limit.is_some() && !self.state_compute_result.has_reconfiguration() {
             // After the per-block gas limit change,
             // insert state checkpoint at the position

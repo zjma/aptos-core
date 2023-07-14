@@ -18,7 +18,8 @@ use aptos_executor_types::{Error, StateComputeResult};
 use aptos_infallible::Mutex;
 use aptos_logger::prelude::*;
 use aptos_types::{
-    epoch_state::EpochState, ledger_info::LedgerInfoWithSignatures, transaction::SignedTransaction,
+    epoch_state::EpochState, ledger_info::LedgerInfoWithSignatures, randomness::Randomness,
+    transaction::SignedTransaction,
 };
 use futures::{channel::mpsc, SinkExt};
 use futures_channel::mpsc::UnboundedSender;
@@ -84,6 +85,7 @@ impl StateComputer for MockStateComputer {
         &self,
         block: &Block,
         _parent_block_id: HashValue,
+        _maybe_randomness: Option<Randomness>,
     ) -> Result<StateComputeResult, Error> {
         self.block_cache.lock().insert(
             block.id(),
@@ -155,6 +157,7 @@ impl StateComputer for EmptyStateComputer {
         &self,
         _block: &Block,
         _parent_block_id: HashValue,
+        _maybe_randomness: Option<Randomness>,
     ) -> Result<StateComputeResult, Error> {
         Ok(StateComputeResult::new_dummy())
     }
@@ -210,6 +213,7 @@ impl StateComputer for RandomComputeResultStateComputer {
         &self,
         _block: &Block,
         parent_block_id: HashValue,
+        _maybe_randomness: Option<Randomness>,
     ) -> Result<StateComputeResult, Error> {
         // trapdoor for Execution Error
         if parent_block_id == self.random_compute_result_root_hash {

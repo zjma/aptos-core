@@ -16,7 +16,9 @@ use aptos_consensus_types::{
 };
 use aptos_crypto::HashValue;
 use aptos_executor_types::{Error as ExecutionError, StateComputeResult};
-use aptos_types::{epoch_state::EpochState, ledger_info::LedgerInfoWithSignatures, randomness::Randomness};
+use aptos_types::{
+    epoch_state::EpochState, ledger_info::LedgerInfoWithSignatures, randomness::Randomness,
+};
 use futures::future::BoxFuture;
 use std::{sync::Arc, time::Duration};
 

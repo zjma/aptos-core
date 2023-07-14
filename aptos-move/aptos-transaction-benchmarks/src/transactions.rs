@@ -313,6 +313,8 @@ where
             BitVec::with_num_bits(self.validator_set.num_validators() as u16).into(),
             vec![],
             1,
+            vec![],
+            None,
         );
 
         transactions.insert(0, Transaction::BlockMetadata(new_block));

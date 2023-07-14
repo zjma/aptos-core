@@ -22,7 +22,7 @@ use aptos_infallible::Mutex;
 use aptos_logger::prelude::*;
 use aptos_types::{
     account_address::AccountAddress, contract_event::ContractEvent, epoch_state::EpochState,
-    ledger_info::LedgerInfoWithSignatures, transaction::Transaction, randomness::Randomness,
+    ledger_info::LedgerInfoWithSignatures, randomness::Randomness, transaction::Transaction,
 };
 use fail::fail_point;
 use futures::{SinkExt, StreamExt};

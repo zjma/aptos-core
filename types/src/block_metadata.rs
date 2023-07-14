@@ -2,10 +2,10 @@
 // Parts of the project are originally copyright © Meta Platforms, Inc.
 // SPDX-License-Identifier: Apache-2.0
 
+use crate::randomness::{DKGTranscript, Randomness};
 use aptos_crypto::HashValue;
 use move_core_types::{account_address::AccountAddress, value::MoveValue};
 use serde::{Deserialize, Serialize};
-use crate::randomness::{DKGTranscript, Randomness};
 /// Struct that will be persisted on chain to store the information of the current block.
 ///
 /// The flow will look like following:

@@ -16,9 +16,10 @@ use aptos_types::{
     block_metadata::BlockMetadata,
     epoch_state::EpochState,
     ledger_info::LedgerInfo,
+    randomness::{DKGTranscript, Randomness},
     transaction::{SignedTransaction, Transaction, Version},
     validator_signer::ValidatorSigner,
-    validator_verifier::ValidatorVerifier, randomness::{DKGTranscript, Randomness},
+    validator_verifier::ValidatorVerifier,
 };
 use mirai_annotations::debug_checked_verify_eq;
 use serde::{Deserialize, Deserializer, Serialize};
@@ -353,24 +354,33 @@ impl Block {
         if block_gas_limit.is_some() {
             // After the per-block gas limit change, StateCheckpoint txn
             // is inserted after block execution
-            once(Transaction::BlockMetadata(
-                self.new_block_metadata(validators, dkg_transcripts, maybe_randomness),
-            ))
+            once(Transaction::BlockMetadata(self.new_block_metadata(
+                validators,
+                dkg_transcripts,
+                maybe_randomness,
+            )))
             .chain(txns.into_iter().map(Transaction::UserTransaction))
             .collect()
         } else {
             // Before the per-block gas limit change, StateCheckpoint txn
             // is inserted here for compatibility.
-            once(Transaction::BlockMetadata(
-                self.new_block_metadata(validators, dkg_transcripts, maybe_randomness),
-            ))
+            once(Transaction::BlockMetadata(self.new_block_metadata(
+                validators,
+                dkg_transcripts,
+                maybe_randomness,
+            )))
             .chain(txns.into_iter().map(Transaction::UserTransaction))
             .chain(once(Transaction::StateCheckpoint(self.id)))
             .collect()
         }
     }
 
-    fn new_block_metadata(&self, validators: &[AccountAddress], dkg_transcripts: Vec<DKGTranscript>, maybe_randomness: Option<Randomness>) -> BlockMetadata {
+    fn new_block_metadata(
+        &self,
+        validators: &[AccountAddress],
+        dkg_transcripts: Vec<DKGTranscript>,
+        maybe_randomness: Option<Randomness>,
+    ) -> BlockMetadata {
         BlockMetadata::new(
             self.id(),
             self.epoch(),

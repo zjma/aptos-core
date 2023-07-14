@@ -18,7 +18,9 @@ use aptos_consensus_types::{block::Block, executed_block::ExecutedBlock};
 use aptos_crypto::HashValue;
 use aptos_executor_types::{Error as ExecutionError, StateComputeResult};
 use aptos_logger::prelude::*;
-use aptos_types::{epoch_state::EpochState, ledger_info::LedgerInfoWithSignatures, randomness::Randomness};
+use aptos_types::{
+    epoch_state::EpochState, ledger_info::LedgerInfoWithSignatures, randomness::Randomness,
+};
 use fail::fail_point;
 use futures::{
     channel::{mpsc::UnboundedSender, oneshot},
@@ -77,6 +79,9 @@ impl StateComputer for OrderingStateComputer {
         callback: StateComputerCommitCallBackType,
     ) -> Result<(), ExecutionError> {
         assert!(!blocks.is_empty());
+
+        // dkg todo: generate randomness (from the DAG proposals) and insert to the blocks for the optimistic case
+        // I think this interface may change after the DAG
 
         if self
             .executor_channel
