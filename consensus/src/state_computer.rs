@@ -126,7 +126,7 @@ impl StateComputer for ExecutionProxy {
         let txn_deduper = self.transaction_deduper.lock().as_ref().unwrap().clone();
         let txn_shuffler = self.transaction_shuffler.lock().as_ref().unwrap().clone();
         let txns = payload_manager.get_transactions(block).await?;
-
+        println!("a={}", aptos_dkg::G1_PROJ_NUM_BYTES);
         // dkg todo: get the dkg transcript from the txns
         let dkg_transcripts = vec![];
 
