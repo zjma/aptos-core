@@ -26,13 +26,15 @@ pub fn double_internal(
     let structure_opt = structure_from_ty_arg!(context, &ty_args[0]);
     abort_unless_arithmetics_enabled_for_structure!(context, structure_opt);
     match structure_opt {
-        Some(Structure::BLS12381G1) => ark_unary_op_internal!(
-            context,
-            args,
-            ark_bls12_381::G1Projective,
-            double,
-            ALGEBRA_ARK_BLS12_381_G1_PROJ_DOUBLE
-        ),
+        Some(Structure::BLS12381G1) => {
+            let handle = aptos_native_interface::safely_pop_arg!( args , u64 ) as usize;
+            safe_borrow_element!( context , handle , ark_bls12_381::G1Projective , element_ptr , element );
+            context.charge(ALGEBRA_ARK_BLS12_381_G1_PROJ_DOUBLE
+            )?;
+            let new_element = element.double();
+            let new_handle = store_element!( context , new_element )?;
+            Ok(smallvec![ Value :: u64 ( new_handle as u64 ) ])
+        },
         Some(Structure::BLS12381G2) => ark_unary_op_internal!(
             context,
             args,

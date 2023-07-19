@@ -28,14 +28,14 @@ pub fn mul_internal(
             context,
             args,
             ark_bls12_381::Fr,
-            Mul::mul,
+            mul,
             ALGEBRA_ARK_BLS12_381_FR_MUL
         ),
         Some(Structure::BLS12381Fq12) => ark_binary_op_internal!(
             context,
             args,
             ark_bls12_381::Fq12,
-            Mul::mul,
+            mul,
             ALGEBRA_ARK_BLS12_381_FQ12_MUL
         ),
         _ => Err(SafeNativeError::Abort {

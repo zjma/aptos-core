@@ -32,35 +32,35 @@ pub fn sub_internal(
             context,
             args,
             ark_bls12_381::Fr,
-            Sub::sub,
+            sub,
             ALGEBRA_ARK_BLS12_381_FR_SUB
         ),
         Some(Structure::BLS12381Fq12) => ark_binary_op_internal!(
             context,
             args,
             ark_bls12_381::Fq12,
-            Sub::sub,
+            sub,
             ALGEBRA_ARK_BLS12_381_FQ12_SUB
         ),
         Some(Structure::BLS12381G1) => ark_binary_op_internal!(
             context,
             args,
             ark_bls12_381::G1Projective,
-            Sub::sub,
+            sub,
             ALGEBRA_ARK_BLS12_381_G1_PROJ_SUB
         ),
         Some(Structure::BLS12381G2) => ark_binary_op_internal!(
             context,
             args,
             ark_bls12_381::G2Projective,
-            Sub::sub,
+            sub,
             ALGEBRA_ARK_BLS12_381_G2_PROJ_SUB
         ),
         Some(Structure::BLS12381Gt) => ark_binary_op_internal!(
             context,
             args,
             ark_bls12_381::Fq12,
-            Div::div,
+            div,
             ALGEBRA_ARK_BLS12_381_FQ12_DIV
         ),
         _ => Err(SafeNativeError::Abort {
