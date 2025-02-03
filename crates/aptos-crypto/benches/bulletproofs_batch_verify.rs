@@ -10,6 +10,7 @@ use criterion::{measurement::Measurement, BenchmarkGroup, BenchmarkId, Criterion
 use curve25519_dalek_ng::scalar::Scalar;
 use merlin::Transcript;
 use rand::{thread_rng, Rng};
+use rand_core::RngCore;
 
 fn get_values(num_bits: usize, batch_size: usize) -> (Vec<u64>, Vec<Scalar>) {
     let mut rng = thread_rng();
@@ -18,28 +19,33 @@ fn get_values(num_bits: usize, batch_size: usize) -> (Vec<u64>, Vec<Scalar>) {
         .map(|_| rng.gen_range(0u64, (2u128.pow(num_bits as u32) - 1u128) as u64))
         .collect::<Vec<u64>>();
 
-    // Sigh, some RngCore incompatibilites I don't want to deal with right now.
+    // Sigh, some RngCore incompatibilities I don't want to deal with right now.
     let b = (0..batch_size)
-        .map(|_| Scalar::hash_from_bytes::<sha3::Sha3_512>(b"some random blinder"))
+        .map(|_| {
+            let mut scalar = [0u8; 32];
+            rng.fill_bytes(&mut scalar);
+
+            Scalar::from_bytes_mod_order(scalar)
+        })
         .collect::<Vec<Scalar>>();
 
     (v, b)
 }
 
 fn bench_group(c: &mut Criterion) {
-    let mut group = c.benchmark_group("bulletproofs_batch_vrfy");
+    let mut group = c.benchmark_group("bulletproofs_batch_verify");
 
     for batch_size in [1, 2, 4, 8, 16] {
         for num_bits in [8, 16, 32, 64] {
-            range_prove(&mut group, num_bits, batch_size);
-            range_verify(&mut group, num_bits, batch_size);
+            range_batch_prove(&mut group, num_bits, batch_size);
+            range_batch_verify(&mut group, num_bits, batch_size);
         }
     }
 
     group.finish();
 }
 
-fn range_prove<M: Measurement>(g: &mut BenchmarkGroup<M>, num_bits: usize, batch_size: usize) {
+fn range_batch_prove<M: Measurement>(g: &mut BenchmarkGroup<M>, num_bits: usize, batch_size: usize) {
     let pg = PedersenGens::default();
     let bg = BulletproofGens::new(MAX_RANGE_BITS, 16);
 
@@ -66,7 +72,7 @@ fn range_prove<M: Measurement>(g: &mut BenchmarkGroup<M>, num_bits: usize, batch
     );
 }
 
-fn range_verify<M: Measurement>(g: &mut BenchmarkGroup<M>, num_bits: usize, batch_size: usize) {
+fn range_batch_verify<M: Measurement>(g: &mut BenchmarkGroup<M>, num_bits: usize, batch_size: usize) {
     let bp_gens = BulletproofGens::new(MAX_RANGE_BITS, 16);
     let pc_gens = PedersenGens::default();
 

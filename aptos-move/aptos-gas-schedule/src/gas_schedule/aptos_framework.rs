@@ -243,7 +243,7 @@ crate::gas_schedule::macros::define_gas_parameters!(
         // Bulletproofs gas parameters end.
 
         // Bulletproofs batch vrfy gas parameters begin.
-        // Generated at time 1738278510.3867955 by `scripts/algebra-gas/update_bulletproofs_batch_vrfy_gas_params.py` with gas_per_ns=295.16.
+        // Generated at time 1738278510.3867955 by `scripts/algebra-gas/update_bulletproofs_batch_verify_gas_params.py` with gas_per_ns=295.16.
         [bulletproofs_verify_base_batch_1_bits_8: InternalGas, { RELEASE_V1_27.. => "bulletproofs.verify.base_batch_1_bits_8" }, 133_731_503],
         [bulletproofs_verify_base_batch_1_bits_16: InternalGas, { RELEASE_V1_27.. => "bulletproofs.verify.base_batch_1_bits_16" }, 195_542_132],
         [bulletproofs_verify_base_batch_1_bits_32: InternalGas, { RELEASE_V1_27.. => "bulletproofs.verify.base_batch_1_bits_32" }, 310_976_813],

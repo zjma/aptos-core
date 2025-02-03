@@ -101,7 +101,7 @@ name = "bulletproofs"
 harness = false
 
 [[bench]]
-name = "bulletproofs_batch_vrfy"
+name = "bulletproofs_batch_verify"
 harness = false
 
 [[bench]]

@@ -29,7 +29,7 @@ def get_bulletproofs_lines(gas_per_ns):
 
     for batch_size in [1, 2, 4, 8, 16]:
         for num_bits in [8, 16, 32, 64]:
-            ns = load_bench_ns.main(f'target/criterion/bulletproofs_batch_vrfy/range_verify/batch={batch_size}_bits={num_bits}')
+            ns = load_bench_ns.main(f'target/criterion/bulletproofs_batch_verify/range_verify/batch={batch_size}_bits={num_bits}')
 
             nanoseconds[f'bulletproofs_verify_base_batch_{batch_size}_bits_{num_bits}'] = ns
 
@@ -46,9 +46,9 @@ def get_bulletproofs_lines(gas_per_ns):
 def main(gas_per_ns):
     path = Path('aptos-move/aptos-gas-schedule/src/gas_schedule/aptos_framework.rs')
     lines = path.read_text().split('\n')
-    line_id_begin = lines.index('        // Bulletproofs batch vrfy gas parameters begin.')
-    line_id_end = lines.index('        // Bulletproofs batch vrfy gas parameters end.')
-    generator_note_line = f'        // Generated at time {time()} by `scripts/algebra-gas/update_bulletproofs_batch_vrfy_gas_params.py` with gas_per_ns={gas_per_ns}.'
+    line_id_begin = lines.index('        // Bulletproofs batch verify gas parameters begin.')
+    line_id_end = lines.index('        // Bulletproofs batch verify gas parameters end.')
+    generator_note_line = f'        // Generated at time {time()} by `scripts/algebra-gas/update_bulletproofs_batch_verify_gas_params.py` with gas_per_ns={gas_per_ns}.'
     new_lines = lines[:line_id_begin+1] + [generator_note_line] + get_bulletproofs_lines(gas_per_ns) + lines[line_id_end:]
     path.write_text('\n'.join(new_lines))
 

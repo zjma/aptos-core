@@ -86,7 +86,17 @@ The native functions have not been rolled out yet.
 The range proof system only supports batch sizes of 1, 2, 4, 8, and 16.
 
 
-<pre><code><b>const</b> <a href="ristretto255_bulletproofs.md#0x1_ristretto255_bulletproofs_E_BATCH_SIZE_NOT_SUPPORTED">E_BATCH_SIZE_NOT_SUPPORTED</a>: u64 = 3;
+<pre><code><b>const</b> <a href="ristretto255_bulletproofs.md#0x1_ristretto255_bulletproofs_E_BATCH_SIZE_NOT_SUPPORTED">E_BATCH_SIZE_NOT_SUPPORTED</a>: u64 = 4;
+</code></pre>
+
+
+
+<a id="0x1_ristretto255_bulletproofs_E_DESERIALIZE_RANGE_PROOF"></a>
+
+There was an error deserializing the range proof.
+
+
+<pre><code><b>const</b> <a href="ristretto255_bulletproofs.md#0x1_ristretto255_bulletproofs_E_DESERIALIZE_RANGE_PROOF">E_DESERIALIZE_RANGE_PROOF</a>: u64 = 1;
 </code></pre>
 
 
@@ -96,7 +106,7 @@ The range proof system only supports batch sizes of 1, 2, 4, 8, and 16.
 The range proof system only supports proving ranges of type $[0, 2^b)$ where $b \in \{8, 16, 32, 64\}$.
 
 
-<pre><code><b>const</b> <a href="ristretto255_bulletproofs.md#0x1_ristretto255_bulletproofs_E_RANGE_NOT_SUPPORTED">E_RANGE_NOT_SUPPORTED</a>: u64 = 2;
+<pre><code><b>const</b> <a href="ristretto255_bulletproofs.md#0x1_ristretto255_bulletproofs_E_RANGE_NOT_SUPPORTED">E_RANGE_NOT_SUPPORTED</a>: u64 = 3;
 </code></pre>
 
 
@@ -106,7 +116,7 @@ The range proof system only supports proving ranges of type $[0, 2^b)$ where $b 
 The committed value given to the prover is too large.
 
 
-<pre><code><b>const</b> <a href="ristretto255_bulletproofs.md#0x1_ristretto255_bulletproofs_E_VALUE_OUTSIDE_RANGE">E_VALUE_OUTSIDE_RANGE</a>: u64 = 1;
+<pre><code><b>const</b> <a href="ristretto255_bulletproofs.md#0x1_ristretto255_bulletproofs_E_VALUE_OUTSIDE_RANGE">E_VALUE_OUTSIDE_RANGE</a>: u64 = 2;
 </code></pre>
 
 
@@ -116,7 +126,7 @@ The committed value given to the prover is too large.
 The vector lengths of values and blinding factors do not match.
 
 
-<pre><code><b>const</b> <a href="ristretto255_bulletproofs.md#0x1_ristretto255_bulletproofs_E_VECTOR_LENGTHS_MISMATCH">E_VECTOR_LENGTHS_MISMATCH</a>: u64 = 4;
+<pre><code><b>const</b> <a href="ristretto255_bulletproofs.md#0x1_ristretto255_bulletproofs_E_VECTOR_LENGTHS_MISMATCH">E_VECTOR_LENGTHS_MISMATCH</a>: u64 = 5;
 </code></pre>
 
 
@@ -286,8 +296,9 @@ for some randomness <code>r</code>) satisfies <code>v</code> in <code>[0, 2^num_
 
 ## Function `verify_batch_range_proof_pedersen`
 
-Verifies a zero-knowledge range proof for a batch of Pedersen commitments <code>comms</code>, ensuring that all values
-<code>v</code> satisfy <code>v</code> in <code>[0, 2^num_bits)</code>.
+Verifies a zero-knowledge range proof for a batch of Pedersen commitments <code>comms</code>
+(under the default Bulletproofs commitment key; see <code>pedersen::new_commitment_for_bulletproof</code>),
+ensuring that all values <code>v</code> satisfy <code>v</code> in <code>[0, 2^num_bits)</code>.
 Only works for <code>num_bits</code> in <code>{8, 16, 32, 64}</code> and batch size (length of <code>comms</code>) in <code>{1, 2, 4, 8, 16}</code>.
 
 
@@ -304,14 +315,12 @@ Only works for <code>num_bits</code> in <code>{8, 16, 32, 64}</code> and batch s
     comms: &<a href="../../move-stdlib/doc/vector.md#0x1_vector">vector</a>&lt;pedersen::Commitment&gt;, proof: &<a href="ristretto255_bulletproofs.md#0x1_ristretto255_bulletproofs_RangeProof">RangeProof</a>,
     num_bits: u64, dst: <a href="../../move-stdlib/doc/vector.md#0x1_vector">vector</a>&lt;u8&gt;): bool
 {
-    <b>assert</b>!(<a href="../../move-stdlib/doc/features.md#0x1_features_bulletproofs_batch_enabled">features::bulletproofs_batch_enabled</a>(), <a href="../../move-stdlib/doc/error.md#0x1_error_invalid_state">error::invalid_state</a>(<a href="ristretto255_bulletproofs.md#0x1_ristretto255_bulletproofs_E_NATIVE_FUN_NOT_AVAILABLE">E_NATIVE_FUN_NOT_AVAILABLE</a>));
-
-    <b>let</b> comms = std::vector::map_ref(comms, |com| <a href="ristretto255.md#0x1_ristretto255_point_to_bytes">ristretto255::point_to_bytes</a>(&pedersen::commitment_as_compressed_point(com)));
-
-    <a href="ristretto255_bulletproofs.md#0x1_ristretto255_bulletproofs_verify_batch_range_proof_internal">verify_batch_range_proof_internal</a>(
-        comms,
+    <a href="ristretto255_bulletproofs.md#0x1_ristretto255_bulletproofs_verify_batch_range_proof">verify_batch_range_proof</a>(
+        &std::vector::map_ref(comms, |com| <a href="ristretto255.md#0x1_ristretto255_point_clone">ristretto255::point_clone</a>(pedersen::commitment_as_point(com))),
         &<a href="ristretto255.md#0x1_ristretto255_basepoint">ristretto255::basepoint</a>(), &<a href="ristretto255.md#0x1_ristretto255_hash_to_point_base">ristretto255::hash_to_point_base</a>(),
-        proof.bytes, num_bits, dst
+        proof,
+        num_bits,
+        dst
     )
 }
 </code></pre>
@@ -329,7 +338,7 @@ Only works for <code>num_bits</code> in <code>{8, 16, 32, 64}</code> and batch s
 (length of the <code>comms</code>) in <code>{1, 2, 4, 8, 16}</code>.
 
 
-<pre><code><b>public</b> <b>fun</b> <a href="ristretto255_bulletproofs.md#0x1_ristretto255_bulletproofs_verify_batch_range_proof">verify_batch_range_proof</a>(comms: &<a href="../../move-stdlib/doc/vector.md#0x1_vector">vector</a>&lt;<a href="ristretto255_pedersen.md#0x1_ristretto255_pedersen_Commitment">ristretto255_pedersen::Commitment</a>&gt;, val_base: &<a href="ristretto255.md#0x1_ristretto255_RistrettoPoint">ristretto255::RistrettoPoint</a>, rand_base: &<a href="ristretto255.md#0x1_ristretto255_RistrettoPoint">ristretto255::RistrettoPoint</a>, proof: &<a href="ristretto255_bulletproofs.md#0x1_ristretto255_bulletproofs_RangeProof">ristretto255_bulletproofs::RangeProof</a>, num_bits: u64, dst: <a href="../../move-stdlib/doc/vector.md#0x1_vector">vector</a>&lt;u8&gt;): bool
+<pre><code><b>public</b> <b>fun</b> <a href="ristretto255_bulletproofs.md#0x1_ristretto255_bulletproofs_verify_batch_range_proof">verify_batch_range_proof</a>(comms: &<a href="../../move-stdlib/doc/vector.md#0x1_vector">vector</a>&lt;<a href="ristretto255.md#0x1_ristretto255_RistrettoPoint">ristretto255::RistrettoPoint</a>&gt;, val_base: &<a href="ristretto255.md#0x1_ristretto255_RistrettoPoint">ristretto255::RistrettoPoint</a>, rand_base: &<a href="ristretto255.md#0x1_ristretto255_RistrettoPoint">ristretto255::RistrettoPoint</a>, proof: &<a href="ristretto255_bulletproofs.md#0x1_ristretto255_bulletproofs_RangeProof">ristretto255_bulletproofs::RangeProof</a>, num_bits: u64, dst: <a href="../../move-stdlib/doc/vector.md#0x1_vector">vector</a>&lt;u8&gt;): bool
 </code></pre>
 
 
@@ -339,13 +348,13 @@ Only works for <code>num_bits</code> in <code>{8, 16, 32, 64}</code> and batch s
 
 
 <pre><code><b>public</b> <b>fun</b> <a href="ristretto255_bulletproofs.md#0x1_ristretto255_bulletproofs_verify_batch_range_proof">verify_batch_range_proof</a>(
-    comms: &<a href="../../move-stdlib/doc/vector.md#0x1_vector">vector</a>&lt;pedersen::Commitment&gt;,
+    comms: &<a href="../../move-stdlib/doc/vector.md#0x1_vector">vector</a>&lt;RistrettoPoint&gt;,
     val_base: &RistrettoPoint, rand_base: &RistrettoPoint,
     proof: &<a href="ristretto255_bulletproofs.md#0x1_ristretto255_bulletproofs_RangeProof">RangeProof</a>, num_bits: u64, dst: <a href="../../move-stdlib/doc/vector.md#0x1_vector">vector</a>&lt;u8&gt;): bool
 {
     <b>assert</b>!(<a href="../../move-stdlib/doc/features.md#0x1_features_bulletproofs_batch_enabled">features::bulletproofs_batch_enabled</a>(), <a href="../../move-stdlib/doc/error.md#0x1_error_invalid_state">error::invalid_state</a>(<a href="ristretto255_bulletproofs.md#0x1_ristretto255_bulletproofs_E_NATIVE_FUN_NOT_AVAILABLE">E_NATIVE_FUN_NOT_AVAILABLE</a>));
 
-    <b>let</b> comms = std::vector::map_ref(comms, |com| <a href="ristretto255.md#0x1_ristretto255_point_to_bytes">ristretto255::point_to_bytes</a>(&pedersen::commitment_as_compressed_point(com)));
+    <b>let</b> comms = std::vector::map_ref(comms, |com| <a href="ristretto255.md#0x1_ristretto255_point_to_bytes">ristretto255::point_to_bytes</a>(&<a href="ristretto255.md#0x1_ristretto255_point_compress">ristretto255::point_compress</a>(com)));
 
     <a href="ristretto255_bulletproofs.md#0x1_ristretto255_bulletproofs_verify_batch_range_proof_internal">verify_batch_range_proof_internal</a>(
         comms,
@@ -363,6 +372,8 @@ Only works for <code>num_bits</code> in <code>{8, 16, 32, 64}</code> and batch s
 
 ## Function `verify_range_proof_internal`
 
+Aborts with <code><a href="../../move-stdlib/doc/error.md#0x1_error_invalid_argument">error::invalid_argument</a>(<a href="ristretto255_bulletproofs.md#0x1_ristretto255_bulletproofs_E_DESERIALIZE_RANGE_PROOF">E_DESERIALIZE_RANGE_PROOF</a>)</code> if <code>proof</code> is not a valid serialization of a
+range proof.
 Aborts with <code><a href="../../move-stdlib/doc/error.md#0x1_error_invalid_argument">error::invalid_argument</a>(<a href="ristretto255_bulletproofs.md#0x1_ristretto255_bulletproofs_E_RANGE_NOT_SUPPORTED">E_RANGE_NOT_SUPPORTED</a>)</code> if an unsupported <code>num_bits</code> is provided.
 
 
@@ -392,6 +403,8 @@ Aborts with <code><a href="../../move-stdlib/doc/error.md#0x1_error_invalid_argu
 
 ## Function `verify_batch_range_proof_internal`
 
+Aborts with <code><a href="../../move-stdlib/doc/error.md#0x1_error_invalid_argument">error::invalid_argument</a>(<a href="ristretto255_bulletproofs.md#0x1_ristretto255_bulletproofs_E_DESERIALIZE_RANGE_PROOF">E_DESERIALIZE_RANGE_PROOF</a>)</code> if <code>proof</code> is not a valid serialization of a
+range proof.
 Aborts with <code><a href="../../move-stdlib/doc/error.md#0x1_error_invalid_argument">error::invalid_argument</a>(<a href="ristretto255_bulletproofs.md#0x1_ristretto255_bulletproofs_E_RANGE_NOT_SUPPORTED">E_RANGE_NOT_SUPPORTED</a>)</code> if an unsupported <code>num_bits</code> is provided.
 Aborts with <code><a href="../../move-stdlib/doc/error.md#0x1_error_invalid_argument">error::invalid_argument</a>(<a href="ristretto255_bulletproofs.md#0x1_ristretto255_bulletproofs_E_BATCH_SIZE_NOT_SUPPORTED">E_BATCH_SIZE_NOT_SUPPORTED</a>)</code> if an unsupported batch size is provided.
 Aborts with <code><a href="../../move-stdlib/doc/error.md#0x1_error_invalid_argument">error::invalid_argument</a>(<a href="ristretto255_bulletproofs.md#0x1_ristretto255_bulletproofs_E_VECTOR_LENGTHS_MISMATCH">E_VECTOR_LENGTHS_MISMATCH</a>)</code> if the vector lengths of <code>comms</code> and <code>proof</code> do not match.
