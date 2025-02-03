@@ -32,8 +32,8 @@ fn bench_group(c: &mut Criterion) {
         range_proof_deserialize(&mut group, num_bits);
     }
 
-    for batch_size in [1, 2] {
-        for num_bits in [32, 64] {
+    for batch_size in [1] {
+        for num_bits in [16, 32, 64] {
             range_prove(&mut group, num_bits, batch_size);
             range_verify(&mut group, num_bits, batch_size);
         }
@@ -112,8 +112,8 @@ fn range_verify<M: Measurement>(g: &mut BenchmarkGroup<M>, num_bits: usize, batc
     g.throughput(Throughput::Elements(batch_size as u64));
     g.bench_function(
         BenchmarkId::new(
-            "range_verify",
-            format!("batch={}/bits={}", batch_size, num_bits),
+            "range_verify", num_bits
+            //format!("batch={}/{}", batch_size, num_bits),
         ),
         move |b| {
             b.iter_with_setup(
