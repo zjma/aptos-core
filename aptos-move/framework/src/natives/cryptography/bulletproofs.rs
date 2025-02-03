@@ -62,6 +62,10 @@ fn is_supported_batch_size(batch_size: usize) -> bool {
 
 /// Public parameters of the Bulletproof range proof system
 static BULLETPROOF_GENERATORS: Lazy<BulletproofGens> =
+    Lazy::new(|| BulletproofGens::new(MAX_RANGE_BITS, 1));
+
+/// Public parameters of the batch Bulletproof range proof system
+static BULLETPROOF_BATCH_GENERATORS: Lazy<BulletproofGens> =
     Lazy::new(|| BulletproofGens::new(MAX_RANGE_BITS, 16));
 
 fn native_verify_range_proof(
@@ -285,7 +289,7 @@ fn native_test_only_batch_prove_range(
 
     // Construct a range proof.
     let (proof, commitments) = bulletproofs::RangeProof::prove_multiple(
-        &BULLETPROOF_GENERATORS,
+        &BULLETPROOF_BATCH_GENERATORS,
         &pg,
         &mut t,
         &vs,
@@ -377,7 +381,7 @@ fn verify_batch_range_proof(
 
     let success = range_proof
         .verify_multiple(
-            &BULLETPROOF_GENERATORS,
+            &BULLETPROOF_BATCH_GENERATORS,
             pc_gens,
             &mut ver_trans,
             comm_points,
