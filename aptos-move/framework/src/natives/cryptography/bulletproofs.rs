@@ -366,7 +366,11 @@ fn verify_batch_range_proof(
 
     let range_proof = match bulletproofs::RangeProof::from_bytes(proof_bytes) {
         Ok(proof) => proof,
-        Err(_) => return Ok(smallvec![Value::bool(false)]),
+        Err(_) => {
+            return Err(SafeNativeError::Abort {
+                abort_code: abort_codes::NFE_DESERIALIZE_RANGE_PROOF,
+            })
+        },
     };
 
     let mut ver_trans = Transcript::new(dst.as_slice());

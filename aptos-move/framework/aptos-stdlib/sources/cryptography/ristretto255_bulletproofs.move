@@ -247,6 +247,8 @@ module aptos_std::ristretto255_bulletproofs {
         num_bits: u64,
         dst: vector<u8>): bool;
 
+    /// Aborts with `error::invalid_argument(E_DESERIALIZE_RANGE_PROOF)` if `proof` is not a valid serialization of a
+    /// range proof.
     /// Aborts with `error::invalid_argument(E_RANGE_NOT_SUPPORTED)` if an unsupported `num_bits` is provided.
     /// Aborts with `error::invalid_argument(E_BATCH_SIZE_NOT_SUPPORTED)` if an unsupported batch size is provided.
     /// Aborts with `error::invalid_argument(E_VECTOR_LENGTHS_MISMATCH)` if the vector lengths of `comms` and `proof` do not match.
@@ -423,6 +425,7 @@ module aptos_std::ristretto255_bulletproofs {
     }
 
     #[test(fx = @std)]
+    #[expected_failure(abort_code = 0x010001, location = Self)]
     fun test_empty_batch_range_proof(fx: signer) {
         features::change_feature_flags_for_testing(&fx, vector[ features::get_bulletproofs_batch_feature() ], vector[]);
 
@@ -434,7 +437,7 @@ module aptos_std::ristretto255_bulletproofs {
         )];
 
         // This will fail with error::invalid_argument(E_DESERIALIZE_RANGE_PROOF)
-        assert!(verify_batch_range_proof_pedersen(&comms, proof, num_bits, A_DST) == false, 1);
+        verify_batch_range_proof_pedersen(&comms, proof, num_bits, A_DST);
     }
 
     #[test(fx = @std)]
