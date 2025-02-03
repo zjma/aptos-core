@@ -107,8 +107,9 @@ module aptos_std::ristretto255_bulletproofs {
         )
     }
 
-    /// Verifies a zero-knowledge range proof for a batch of Pedersen commitments `comms`, ensuring that all values
-    /// `v` satisfy `v` in `[0, 2^num_bits)`.
+    /// Verifies a zero-knowledge range proof for a batch of Pedersen commitments `comms`
+    /// (under the default Bulletproofs commitment key; see `pedersen::new_commitment_for_bulletproof`),
+    /// ensuring that all values `v` satisfy `v` in `[0, 2^num_bits)`.
     /// Only works for `num_bits` in `{8, 16, 32, 64}` and batch size (length of `comms`) in `{1, 2, 4, 8, 16}`.
     public fun verify_batch_range_proof_pedersen(
         comms: &vector<pedersen::Commitment>, proof: &RangeProof,
