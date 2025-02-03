@@ -34,19 +34,19 @@ pub mod abort_codes {
 
     /// Abort code when input value for a range proof is too large.
     /// NOTE: This must match the code in the Move implementation
-    pub const NFE_VALUE_OUTSIDE_RANGE: u64 = 0x01_0001;
+    pub const NFE_VALUE_OUTSIDE_RANGE: u64 = 0x01_0002;
 
     /// Abort code when the requested range is larger than the maximum supported one.
     /// NOTE: This must match the code in the Move implementation
-    pub const NFE_RANGE_NOT_SUPPORTED: u64 = 0x01_0002;
+    pub const NFE_RANGE_NOT_SUPPORTED: u64 = 0x01_0003;
 
     /// Abort code when the requested batch size is larger than the maximum supported one.
     /// NOTE: This must match the code in the Move implementation
-    pub const NFE_BATCH_SIZE_NOT_SUPPORTED: u64 = 0x01_0003;
+    pub const NFE_BATCH_SIZE_NOT_SUPPORTED: u64 = 0x01_0004;
 
     /// Abort code when the vector lengths of values and blinding factors do not match.
     /// NOTE: This must match the code in the Move implementation
-    pub const NFE_VECTOR_LENGTHS_MISMATCH: u64 = 0x01_0004;
+    pub const NFE_VECTOR_LENGTHS_MISMATCH: u64 = 0x01_0005;
 }
 
 /// The Bulletproofs library only seems to support proving [0, 2^{num_bits}) ranges where num_bits is
